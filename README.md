@@ -22,21 +22,29 @@ Nightshift provides pre-built agents that run as scheduled GitHub Actions workfl
 /plugin install nightshift@nightshift
 ```
 
-### 2. Set up agents in your repo
+### 2. Set up your repo
 
 ```bash
 cd your-project
 claude
-> /nightshift
+> /nightshift:setup-project
+```
+
+Claude creates a GitHub Project board, enables the wiki, adds labels, and optionally protects `main`.
+
+### 3. Set up agents
+
+```bash
+> /nightshift:setup-agents
 ```
 
 Claude walks you through picking agents, configuring triggers (PR, cron, label), and scaffolds everything into your repo.
 
-### 3. Add your API key
+### 4. Add your API key
 
 Go to your repo's **Settings > Secrets and variables > Actions** and add `ANTHROPIC_API_KEY`.
 
-### 4. Done
+### 5. Done
 
 Agents run automatically on their configured triggers. Customize any agent by editing its markdown file in `.github/nightshift/agents/`.
 
@@ -75,7 +83,7 @@ Agents run automatically on their configured triggers. Customize any agent by ed
 
 **Change when an agent runs:** Edit the `on:` section in `.github/workflows/nightshift-*.yml`. Any GitHub Actions trigger works — cron, PR events, labels, manual dispatch.
 
-**Add/remove agents:** Just ask Claude in your repo: "Add the dead code detector, run it monthly" or "Remove the security auditor". Or run `/nightshift` again.
+**Add/remove agents:** Just ask Claude in your repo: "Add the dead code detector, run it monthly" or "Remove the security auditor". Or run `/nightshift:setup-agents` again.
 
 ## Plugin Skills
 
@@ -83,7 +91,8 @@ When installed, Nightshift also provides these Claude Code skills for your workf
 
 | Skill | Purpose |
 |-------|---------|
-| `/nightshift` | Interactive agent setup |
+| `/nightshift:setup-project` | Repo infrastructure setup (project board, wiki, labels, branch protection) |
+| `/nightshift:setup-agents` | Interactive agent setup |
 | Creating issues | Structured GitHub issue creation |
 | Creating pull requests | Well-formatted PR descriptions |
 | Writing wiki pages | GitHub Wiki documentation |
