@@ -166,6 +166,7 @@ mkdir -p /tmp/<REPO>-wiki
 cd /tmp/<REPO>-wiki
 git init
 git checkout -b main
+gh auth setup-git  # ensure gh token works as git credential
 git remote add origin https://github.com/<OWNER>/<REPO>.wiki.git
 ```
 
@@ -322,7 +323,7 @@ Setup complete:
   [applied/skipped] Branch protection on main
   [updated] CLAUDE.md with project board IDs
 
-Next: run /nightshift:setup-agents to install automated agents.
+Next: run nightshift:setup-agents to install automated agents.
 ```
 
 ## Quality Bar
@@ -338,4 +339,4 @@ Next: run /nightshift:setup-agents to install automated agents.
 |------|--------|
 | `plugins/nightshift/skills/setup-project/SKILL.md` | Create (new skill) |
 | `plugins/nightshift/skills/nightshift/` | Rename to `skills/setup-agents/` |
-| `plugins/nightshift/skills/nightshift/SKILL.md` | Update frontmatter name to `setup-agents`, H1 to `# Setup Agents` |
+| `plugins/nightshift/skills/setup-agents/SKILL.md` | Update frontmatter name to `setup-agents`, H1 to `# Setup Agents` |
