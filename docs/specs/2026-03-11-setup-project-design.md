@@ -54,7 +54,9 @@ name: setup-agents
 description: Set up Nightshift agents in a repository — scaffolds agent prompts and GitHub Actions workflows for automated code review, security audits, dependency updates, and more
 ```
 
-No changes to skill content — only the directory name and frontmatter `name` field.
+The H1 heading inside the skill body is updated from `# Nightshift Setup` to `# Setup Agents`. No other content changes.
+
+**Ordering:** The rename must land before or together with the new `setup-project` skill, since Step 7 of `setup-project` references `nightshift:setup-agents`.
 
 ### Procedure
 
@@ -86,7 +88,17 @@ Report findings to the user: "Here's what I found: [project exists / no project]
 gh project create --owner <OWNER> --title "<REPO>" --format json
 ```
 
-**If project exists:** adopt it and check for missing fields/views.
+**If multiple projects exist:** ask the user which one to use. If only one exists, adopt it automatically.
+
+**If one project exists:** adopt it — record its number and check for missing fields/views.
+
+**Checking existing fields** on the adopted project:
+
+```bash
+gh project field-list <PROJECT_NUMBER> --owner <OWNER> --format json
+```
+
+Compare returned fields against the required set. Only create fields that are missing.
 
 **Configure Status field** (single-select) with options:
 - Backlog
@@ -100,25 +112,70 @@ gh project create --owner <OWNER> --title "<REPO>" --format json
 - High
 - Critical
 
-**Add Board view** grouped by Status field.
+**Creating a single-select field** (example for Status):
 
-All field/view operations use `gh api graphql` with the Projects v2 GraphQL API. The skill instructs Claude to query existing fields first, then only create what's missing (idempotent).
+```bash
+gh api graphql -f query='
+  mutation {
+    createProjectV2Field(input: {
+      projectId: "<PROJECT_NODE_ID>"
+      dataType: SINGLE_SELECT
+      name: "Status"
+      singleSelectOptions: [
+        {name: "Backlog", color: GRAY}
+        {name: "Todo", color: BLUE}
+        {name: "In Progress", color: YELLOW}
+        {name: "Done", color: GREEN}
+      ]
+    }) {
+      projectV2Field { ... on ProjectV2SingleSelectField { id options { id name } } }
+    }
+  }
+'
+```
+
+Use the same pattern for the Priority field (colors: GRAY, BLUE, ORANGE, RED).
+
+**Add Board view** grouped by Status field. Check existing views first via `gh project view <NUMBER> --owner <OWNER> --format json` — only create if no Board view exists.
+
+**Retrieving field and option IDs** for CLAUDE.md (Step 6):
+
+```bash
+gh project field-list <PROJECT_NUMBER> --owner <OWNER> --format json
+```
+
+Parse the JSON output to extract field IDs and option IDs for Status and Priority fields.
 
 #### Step 3 — Wiki
 
 ```bash
 # Enable wiki if not already enabled
 gh api repos/<OWNER>/<REPO> -X PATCH -f has_wiki=true
+```
 
-# Clone wiki repo to temp directory
-git clone https://github.com/<OWNER>/<REPO>.wiki.git /tmp/<REPO>-wiki 2>/dev/null
+**Clone wiki repo** using `gh` for automatic auth:
 
-# If clone fails (no wiki content yet), initialize it
-mkdir -p /tmp/<REPO>-wiki && cd /tmp/<REPO>-wiki && git init
+```bash
+gh repo clone <OWNER>/<REPO>.wiki /tmp/<REPO>-wiki
+```
+
+**If clone fails** (wiki has no content yet — common for newly enabled wikis):
+
+```bash
+mkdir -p /tmp/<REPO>-wiki
+cd /tmp/<REPO>-wiki
+git init
+git checkout -b main
 git remote add origin https://github.com/<OWNER>/<REPO>.wiki.git
 ```
 
-**Create Home.md:**
+**Idempotency:** If `Home.md` already exists in the wiki, skip this step and inform the user: "Wiki Home.md already exists — skipping." Do not overwrite user-edited content.
+
+**If Home.md does not exist**, create it. Determine the project board URL based on owner type:
+- Organization: `https://github.com/orgs/<OWNER>/projects/<NUMBER>`
+- User account: `https://github.com/users/<OWNER>/projects/<NUMBER>`
+
+Check owner type via `gh api users/<OWNER> --jq '.type'` (returns "Organization" or "User").
 
 ```markdown
 # <REPO> Wiki
@@ -128,7 +185,7 @@ git remote add origin https://github.com/<OWNER>/<REPO>.wiki.git
 ## Quick Links
 
 - [Repository](https://github.com/<OWNER>/<REPO>)
-- [Project Board](https://github.com/orgs/<OWNER>/projects/<NUMBER>) or user project URL
+- [Project Board](<appropriate URL based on owner type>)
 - [Issues](https://github.com/<OWNER>/<REPO>/issues)
 
 ## Contents
@@ -136,13 +193,22 @@ git remote add origin https://github.com/<OWNER>/<REPO>.wiki.git
 _Pages will be added as the project grows._
 ```
 
+**Commit and push:**
+
 ```bash
 cd /tmp/<REPO>-wiki
 git add -A
 git commit -m "docs: initialize wiki with Home page"
-git push -u origin main  # or master, depending on default branch
+git push -u origin main
+```
+
+**Clean up** only on successful push:
+
+```bash
 rm -rf /tmp/<REPO>-wiki
 ```
+
+If push fails, inform the user and leave `/tmp/<REPO>-wiki` intact for manual recovery.
 
 #### Step 4 — Issue label
 
@@ -164,7 +230,15 @@ Ask the user:
 >
 > Set this up?"
 
-**If yes**, apply via repository ruleset (preferred over legacy branch protection for GitHub Free compatibility):
+**If yes**, first check for an existing "Protect main" ruleset:
+
+```bash
+gh api repos/<OWNER>/<REPO>/rulesets --jq '.[] | select(.name == "Protect main")'
+```
+
+If it already exists, inform the user: "Branch protection ruleset 'Protect main' already exists — skipping." Do not create a duplicate.
+
+If it does not exist, apply via repository ruleset (preferred over legacy branch protection for GitHub Free compatibility):
 
 ```bash
 gh api repos/<OWNER>/<REPO>/rulesets -X POST --input - <<'EOF'
@@ -229,7 +303,7 @@ Priority field ID: `<field_id>`
 
 **Upsert behavior:**
 - If `## GitHub Project Board` section exists: replace everything from that heading to the next `##` heading (or end of file)
-- If section doesn't exist: append at the end of the file
+- If section doesn't exist: append at the end of the file, ensuring a blank line separator before the new heading
 
 The IDs are retrieved from the GraphQL API after creating/adopting the project fields.
 
@@ -264,4 +338,4 @@ Next: run /nightshift:setup-agents to install automated agents.
 |------|--------|
 | `plugins/nightshift/skills/setup-project/SKILL.md` | Create (new skill) |
 | `plugins/nightshift/skills/nightshift/` | Rename to `skills/setup-agents/` |
-| `plugins/nightshift/skills/nightshift/SKILL.md` | Update frontmatter name to `setup-agents` |
+| `plugins/nightshift/skills/nightshift/SKILL.md` | Update frontmatter name to `setup-agents`, H1 to `# Setup Agents` |
