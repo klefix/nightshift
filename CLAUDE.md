@@ -32,6 +32,7 @@ docs/                    # Design documents (not part of plugin)
 
 ## Conventions
 
+- **Conventional Commits** for all commit messages and PR titles: `<type>(<scope>): <description>` (types: `feat`, `fix`, `refactor`, `docs`, `chore`, `test`, `style`, `perf`)
 - Agent markdown files go in `plugins/nightshift/agents/` (source of truth)
 - When installed in a target repo, agents go in `.github/nightshift/agents/`
 - Workflow templates go in `plugins/nightshift/workflows/`
