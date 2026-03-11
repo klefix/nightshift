@@ -1,0 +1,25 @@
+name: "Nightshift: Dependency Updater"
+
+on:
+  schedule:
+    - cron: "0 3 * * 1" # Mondays at 3am UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  id-token: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            Read and follow the agent instructions in .github/nightshift/agents/dependency-updater.md
+
+            Repository: ${{ github.repository }}
