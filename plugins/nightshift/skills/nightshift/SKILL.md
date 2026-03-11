@@ -64,7 +64,15 @@ Create the directory structure:
     nightshift-<agent>.yml   # generate from template with chosen triggers
 ```
 
-For agent markdown files: copy them from the Nightshift plugin's `agents/` directory. The source files are at the root of the nightshift plugin repo under `agents/`.
+For agent markdown files: read each selected agent's source file from this plugin's `agents/` directory using bash:
+
+```bash
+cat "$CLAUDE_PLUGIN_ROOT/agents/<agent-name>.md"
+```
+
+Copy the content into the target repo at `.github/nightshift/agents/<agent-name>.md`.
+
+If `$CLAUDE_PLUGIN_ROOT` is not set, read the files from the `agents/` directory relative to this skill file (two levels up: `../../agents/`).
 
 For workflow files: generate them using the template pattern below, substituting the agent name and triggers.
 
@@ -108,7 +116,32 @@ After scaffolding, remind the user:
 > Don't forget to add `ANTHROPIC_API_KEY` to your repository secrets:
 > **Settings > Secrets and variables > Actions > New repository secret**
 
-### 6. Commit
+### 6. Configure plugin for CI agents
+
+Scaffold `.claude/settings.json` in the target repo so GitHub Actions agents can use nightshift skills:
+
+```bash
+mkdir -p .claude
+```
+
+If `.claude/settings.json` exists, merge into it. Otherwise create:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "nightshift": {
+      "source": { "source": "github", "repo": "klefix/nightshift" }
+    }
+  },
+  "enabledPlugins": {
+    "nightshift@nightshift": true
+  }
+}
+```
+
+Ask the user if they want to add this configuration. It enables the nightshift skills (creating issues, PRs, wiki pages, etc.) for agents running in GitHub Actions.
+
+### 7. Commit
 
 Stage and commit all new files with message: `feat: add nightshift agents (<list of agents>)`
 

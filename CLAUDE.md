@@ -7,17 +7,20 @@ Nightshift is a Claude Code plugin that scaffolds AI agents (GitHub Actions work
 ## Repo Structure
 
 ```
-agents/          # Agent prompt library (source markdown files)
-workflows/       # GitHub Actions workflow templates
-skills/          # Claude Code plugin skills
-  nightshift/    # /nightshift interactive setup skill
-  creating-issues/
-  creating-pull-requests/
-  writing-wiki-pages/
-  writing-project-updates/
-  writing-adrs/
-  updating-readmes/
-docs/plans/      # Design documents
+.claude-plugin/          # Marketplace manifest
+plugins/nightshift/      # The nightshift plugin
+  .claude-plugin/        # Plugin manifest
+  agents/                # Agent prompt library (source markdown files)
+  workflows/             # GitHub Actions workflow templates
+  skills/                # Claude Code plugin skills
+    nightshift/          # /nightshift interactive setup skill
+    creating-issues/
+    creating-pull-requests/
+    writing-wiki-pages/
+    writing-project-updates/
+    writing-adrs/
+    updating-readmes/
+docs/                    # Design documents (not part of plugin)
 ```
 
 ## Key Concepts
@@ -29,12 +32,12 @@ docs/plans/      # Design documents
 
 ## Conventions
 
-- Agent markdown files go in `agents/` at repo root (source of truth)
+- Agent markdown files go in `plugins/nightshift/agents/` (source of truth)
 - When installed in a target repo, agents go in `.github/nightshift/agents/`
-- Workflow templates go in `workflows/` at repo root
+- Workflow templates go in `plugins/nightshift/workflows/`
 - When installed, workflows go in `.github/workflows/nightshift-*.yml`
 - All workflows include `workflow_dispatch` for manual triggering
-- Skills follow the `SKILL.md` convention in `skills/<name>/SKILL.md`
+- Skills follow the `SKILL.md` convention in `plugins/nightshift/skills/<name>/SKILL.md`
 
 ## GitHub Project Board
 
