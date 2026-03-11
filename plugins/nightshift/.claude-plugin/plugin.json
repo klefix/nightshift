@@ -1,0 +1,9 @@
+{
+  "name": "nightshift",
+  "description": "AI agents that work your GitHub repo overnight — code review, security audits, dependency updates, and more",
+  "version": "1.0.0",
+  "author": {
+    "name": "klefix"
+  },
+  "repository": "https://github.com/klefix/nightshift"
+}
