@@ -18,7 +18,8 @@ Nightshift provides pre-built agents that run as scheduled GitHub Actions workfl
 ### 1. Install the plugin
 
 ```bash
-claude install klefix/nightshift-new
+/plugin marketplace add klefix/nightshift
+/plugin install nightshift@nightshift
 ```
 
 ### 2. Set up agents in your repo
