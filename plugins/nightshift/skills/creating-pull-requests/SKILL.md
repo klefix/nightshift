@@ -68,8 +68,30 @@ Group changes by **logical concern** (not by file):
 
 ### 5. Create the PR
 
+**Title must follow [Conventional Commits](https://www.conventionalcommits.org/):**
+
+`<type>(<optional scope>): <short description>`
+
+| Type | When |
+|------|------|
+| `feat` | New feature or capability |
+| `fix` | Bug fix |
+| `refactor` | Code change that neither fixes a bug nor adds a feature |
+| `docs` | Documentation only |
+| `chore` | Build, CI, tooling, dependencies |
+| `test` | Adding or fixing tests |
+| `style` | Formatting, whitespace (no logic change) |
+| `perf` | Performance improvement |
+
+Examples:
+- `feat: add JWT-based authentication`
+- `fix(auth): handle expired refresh tokens`
+- `chore: upgrade dependencies to latest`
+
+**Why this matters:** GitHub uses the PR title as the squash-merge commit message. A conventional commit title means the merge commit is correctly formatted without manual editing.
+
 ```bash
-gh pr create --title "<concise title, under 70 chars>" --body "$(cat <<'EOF'
+gh pr create --title "<type>(<scope>): <description>" --body "$(cat <<'EOF'
 <the description from step 4>
 EOF
 )"
@@ -83,6 +105,7 @@ Add flags as appropriate:
 
 ## Quality Bar
 
+- **Conventional commit title:** Must start with `type:` or `type(scope):` — no exceptions
 - **Self-contained:** A reader should understand the PR without clicking through to issues
 - **Intent over mechanics:** "Add user authentication" not "modify 5 files"
 - **Embedding-friendly:** Include technology names, pattern names, and domain terms naturally
