@@ -1,5 +1,4 @@
 ---
-name: setup-agents
 description: Set up Nightshift agents in a repository — scaffolds agent prompts and GitHub Actions workflows for automated code review, security audits, dependency updates, and more
 ---
 
