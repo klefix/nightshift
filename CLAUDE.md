@@ -12,8 +12,10 @@ plugins/nightshift/      # The nightshift plugin
   .claude-plugin/        # Plugin manifest
   agents/                # Agent prompt library (source markdown files)
   workflows/             # GitHub Actions workflow templates
-  skills/                # Claude Code plugin skills
-    nightshift/          # /nightshift interactive setup skill
+  commands/              # User-invoked slash commands
+    setup-project.md     # /nightshift:setup-project
+    setup-agents.md      # /nightshift:setup-agents
+  skills/                # Model-invoked agent skills (auto-triggered by context)
     creating-issues/
     creating-pull-requests/
     writing-wiki-pages/
@@ -27,7 +29,7 @@ docs/                    # Design documents (not part of plugin)
 
 - **Agents** are markdown files that define what Claude should do (review code, audit security, etc.)
 - **Workflows** are GitHub Actions YAML files that define when agents run (cron, PR, label, manual)
-- **The `/nightshift` skill** scaffolds agents + workflows into a target repo interactively
+- **`/nightshift:setup-project`** and **`/nightshift:setup-agents`** are user-invoked slash commands for repo setup
 - Agent prompts point Claude to the `.md` file in the target repo: `Read and follow the agent instructions in .github/nightshift/agents/<name>.md`
 
 ## Conventions
@@ -38,7 +40,8 @@ docs/                    # Design documents (not part of plugin)
 - Workflow templates go in `plugins/nightshift/workflows/`
 - When installed, workflows go in `.github/workflows/nightshift-*.yml`
 - All workflows include `workflow_dispatch` for manual triggering
-- Skills follow the `SKILL.md` convention in `plugins/nightshift/skills/<name>/SKILL.md`
+- Slash commands go in `plugins/nightshift/commands/<name>.md` (user-invoked)
+- Agent skills follow the `SKILL.md` convention in `plugins/nightshift/skills/<name>/SKILL.md` (model-invoked)
 
 ## GitHub Project Board
 

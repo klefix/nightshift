@@ -85,20 +85,27 @@ Agents run automatically on their configured triggers. Customize any agent by ed
 
 **Add/remove agents:** Just ask Claude in your repo: "Add the dead code detector, run it monthly" or "Remove the security auditor". Or run `/nightshift:setup-agents` again.
 
-## Plugin Skills
+## Slash Commands
 
-When installed, Nightshift also provides these Claude Code skills for your workflow:
+User-invoked commands for setup and configuration:
 
-| Skill | Purpose |
-|-------|---------|
+| Command | Purpose |
+|---------|---------|
 | `/nightshift:setup-project` | Repo infrastructure setup (project board, wiki, labels, branch protection) |
-| `/nightshift:setup-agents` | Interactive agent setup |
-| Creating issues | Structured GitHub issue creation |
-| Creating pull requests | Well-formatted PR descriptions |
-| Writing wiki pages | GitHub Wiki documentation |
-| Writing project updates | GitHub Projects updates |
-| Writing ADRs | Architecture Decision Records |
-| Updating READMEs | README maintenance |
+| `/nightshift:setup-agents` | Interactive agent setup and scaffolding |
+
+## Agent Skills
+
+When installed, Nightshift also provides Claude Code skills that Claude uses automatically based on context:
+
+| Skill | When it activates |
+|-------|-------------------|
+| Creating issues | When creating, updating, or commenting on GitHub issues |
+| Creating pull requests | When creating a pull request or submitting work for review |
+| Writing wiki pages | When documenting architecture, onboarding guides, or runbooks |
+| Writing project updates | After completing meaningful work (features merged, decisions made) |
+| Writing ADRs | When making architectural decisions or choosing between approaches |
+| Updating READMEs | When project structure, setup instructions, or capabilities change |
 
 ## How It Works
 

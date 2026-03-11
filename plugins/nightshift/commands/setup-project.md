@@ -1,5 +1,4 @@
 ---
-name: setup-project
 description: Set up GitHub Project board, wiki, labels, and branch protection for a repository — one-time repo infrastructure scaffolding
 ---
 
