@@ -116,12 +116,25 @@ jobs:
 
 Agents that create PRs or push commits need `contents: write`. Read-only agents use `contents: read`.
 
-### 5. Remind about secrets
+### 5. Set up API key
 
-After scaffolding, remind the user:
+**This is required — agents will fail without it.**
 
-> Don't forget to add `ANTHROPIC_API_KEY` to your repository secrets:
-> **Settings > Secrets and variables > Actions > New repository secret**
+Tell the user:
+
+> "Nightshift agents need an Anthropic API key to run. You need to add it as a repository secret called `ANTHROPIC_API_KEY`.
+>
+> **To get a key:** Go to https://console.anthropic.com/settings/keys and create one.
+>
+> **To add it to your repo:**
+> 1. Go to your repo **Settings > Secrets and variables > Actions**
+> 2. Click **New repository secret**
+> 3. Name: `ANTHROPIC_API_KEY`
+> 4. Value: paste your key
+>
+> Want me to open the settings page for you?"
+
+If the user confirms, provide the direct URL: `https://github.com/<OWNER>/<REPO>/settings/secrets/actions/new`
 
 ### 6. Configure plugin for CI agents
 
