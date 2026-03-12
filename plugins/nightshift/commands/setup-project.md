@@ -99,26 +99,33 @@ Parse the JSON output to extract field IDs and option IDs for Status and Priorit
 gh api repos/<OWNER>/<REPO> -X PATCH -f has_wiki=true
 ```
 
-**Clone wiki repo** using `gh` for automatic auth:
+**Check if wiki is initialized** by attempting to clone:
 
 ```bash
 gh repo clone <OWNER>/<REPO>.wiki /tmp/<REPO>-wiki
 ```
 
-If clone fails (wiki has no content yet — common for newly enabled wikis):
+**If clone succeeds** — the wiki is initialized:
 
-```bash
-mkdir -p /tmp/<REPO>-wiki
-cd /tmp/<REPO>-wiki
-git init
-git checkout -b main
-gh auth setup-git
-git remote add origin https://github.com/<OWNER>/<REPO>.wiki.git
-```
+If `Home.md` already exists, skip and inform the user: "Wiki Home.md already exists — skipping." Do not overwrite user-edited content.
 
-If `Home.md` already exists in the wiki, skip and inform the user: "Wiki Home.md already exists — skipping." Do not overwrite user-edited content.
+If `Home.md` does not exist, create it using the template below, commit, and push.
 
-If `Home.md` does not exist, create it. Determine the project board URL based on owner type — check via `gh api users/<OWNER> --jq '.type'` (returns "Organization" or "User"):
+**If clone fails** — the wiki has never been initialized:
+
+GitHub requires the first wiki page to be created through the web UI before the wiki git repo becomes available. There is no REST API for wiki pages, and pushing to an uninitialized wiki repo is rejected.
+
+Tell the user:
+
+> "The wiki needs its first page created through the GitHub UI before I can manage it programmatically.
+>
+> Please go to **https://github.com/\<OWNER\>/\<REPO\>/wiki** and click **Create the first page**, then save it with any content.
+>
+> Once that's done, let me know and I can replace it with the Nightshift Home template, or you can re-run this setup."
+
+If the user confirms they've created the first page, retry the clone and proceed.
+
+**Home.md template** — determine the project board URL based on owner type via `gh api users/<OWNER> --jq '.type'` (returns "Organization" or "User"):
 - Organization: `https://github.com/orgs/<OWNER>/projects/<NUMBER>`
 - User account: `https://github.com/users/<OWNER>/projects/<NUMBER>`
 
@@ -138,7 +145,7 @@ If `Home.md` does not exist, create it. Determine the project board URL based on
 _Pages will be added as the project grows._
 ```
 
-Commit and push:
+**Commit and push** (only when wiki is initialized):
 
 ```bash
 cd /tmp/<REPO>-wiki
@@ -252,7 +259,7 @@ Priority field ID: `<field_id>`
 - If `## GitHub Project Board` section exists: replace everything from that heading to the next `##` heading (or end of file)
 - If section doesn't exist: append at the end of the file, ensuring a blank line separator before the new heading
 
-### 7. Summary
+### 7. Summary and project update
 
 Print a summary of what was done:
 
@@ -262,13 +269,18 @@ Setup complete:
   [created/verified] Status field (Backlog, Todo, In Progress, Done)
   [created/verified] Priority field (Low, Medium, High, Critical)
   [created/verified] Board view
-  [enabled/already enabled] Wiki with Home.md
+  [created/already existed/manual action needed] Wiki Home.md
   [created/already existed] "nightshift" label (#1a3a5c)
   [applied/skipped] Branch protection on main
   [updated] CLAUDE.md with project board IDs
 
 Next: run nightshift:setup-agents to install automated agents.
 ```
+
+**Write a project update** using the `nightshift:writing-project-updates` skill. The update should:
+- Summarize what was set up successfully and what needs manual action (if anything)
+- This is a good first entry — set a welcoming tone
+- End with a positive statement about the project being ready for development
 
 ## Quality Bar
 
@@ -286,6 +298,10 @@ Next: run nightshift:setup-agents to install automated agents.
 **Overwriting an edited wiki Home page**
 - Problem: User customized Home.md, skill replaces it with the template
 - Fix: If Home.md exists, skip and inform — never overwrite
+
+**Pushing to an uninitialized wiki**
+- Problem: GitHub rejects git pushes to a wiki repo that has never had a page created through the UI
+- Fix: Detect the clone failure and prompt the user to create the first page via the web UI
 
 **Using legacy branch protection instead of rulesets**
 - Problem: Legacy branch protection requires a paid plan for private repos
