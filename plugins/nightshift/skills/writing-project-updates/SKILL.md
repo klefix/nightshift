@@ -60,9 +60,13 @@ gh project view <NUMBER> --owner <OWNER>
 
 ### 4. Write and create the update
 
+Create the update as a GitHub issue with the `nightshift` label, then add it to the project. Do **not** use `gh project item-create` — it creates draft items that are hidden from the board.
+
 ```bash
-gh project item-create <PROJECT_NUMBER> --owner <OWNER> \
+# Create the issue
+gh issue create \
   --title "<Date> — <One-line summary>" \
+  --label "nightshift" \
   --body "$(cat <<'EOF'
 **What happened:**
 - <Concrete changes, linked to PRs/issues>
@@ -77,6 +81,23 @@ gh project item-create <PROJECT_NUMBER> --owner <OWNER> \
 - <Unresolved decisions or risks — omit if none>
 EOF
 )"
+```
+
+Then add the issue to the project and set its status to **Done**:
+
+```bash
+# Add to project (returns the item ID)
+gh project item-add <PROJECT_NUMBER> --owner <OWNER> --url <ISSUE_URL>
+
+# Set status to Done using the field and option IDs from CLAUDE.md
+gh project item-edit --project-id <PROJECT_NODE_ID> --id <ITEM_ID> \
+  --field-id <STATUS_FIELD_ID> --single-select-option-id <DONE_OPTION_ID>
+```
+
+Finally, close the issue since the update is a record of completed work:
+
+```bash
+gh issue close <ISSUE_NUMBER>
 ```
 
 ## Quality Bar
@@ -99,3 +120,7 @@ EOF
 **Missing links**
 - Problem: Update mentions work without linking to it
 - Fix: Always reference PR/issue numbers
+
+**Creating draft items**
+- Problem: `gh project item-create` creates draft items that are hidden from the board
+- Fix: Create a real issue with `gh issue create`, then add it to the project with `gh project item-add`
