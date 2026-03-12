@@ -40,16 +40,24 @@ If agents already exist, show what's installed and ask what to change.
 
 Present the agent table above. Ask the user to pick which agents they want. Default recommendation: start with `code-reviewer` and `issue-resolver`.
 
-### 3. Configure triggers for each agent
+### 3. Apply default triggers
 
-For each selected agent, ask about triggers. Present the suggested trigger as the default:
+Use the suggested triggers from the agent table — don't ask the user to configure cron schedules. Defaults:
 
+| Trigger type | Cron | Applies to |
+|---|---|---|
+| On PR | n/a | `code-reviewer` |
+| On label + nightly | `0 3 * * *` | `issue-resolver` |
+| Weekly | `0 3 * * 0` (Sunday 3am UTC) | `security-auditor`, `dependency-updater`, `dead-code-detector`, `readme-auditor` |
+
+Trigger details:
 - **On PR**: `pull_request` types `[opened, synchronize, ready_for_review, reopened]`
-- **On label**: `issues` types `[labeled]` — ask which label (default: `nightshift`)
-- **Cron**: ask for frequency — nightly (`0 3 * * *`), weekly (`0 3 * * 0`), monthly (`0 3 1 * *`)
-- **Manual only**: just `workflow_dispatch`
+- **On label**: `issues` types `[labeled]` with the `nightshift` label
+- **Cron**: as specified in the table above
 
 All workflows always include `workflow_dispatch` for manual triggering.
+
+After scaffolding, tell the user: "Cron agents run weekly on Sundays at 3am UTC. You can adjust schedules in `.github/workflows/nightshift-*.yml`."
 
 ### 4. Scaffold files
 
