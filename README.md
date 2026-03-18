@@ -22,7 +22,7 @@ Nightshift provides pre-built agents that run as scheduled GitHub Actions workfl
 /plugin install nightshift@nightshift
 ```
 
-### 2. Set up a Github Project, add Labels for Issues, etc (Optional, if you do not work with Github Issues and Projects)
+### 2. Set up a Github Project (optional & opinionanted!)
 
 ```bash
 cd your-project
